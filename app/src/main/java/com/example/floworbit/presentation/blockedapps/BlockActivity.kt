@@ -1,0 +1,82 @@
+package com.example.floworbit.presentation.blockedapps
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.floworbit.ui.theme.FlowOrbitTheme
+import com.example.floworbit.util.AllowanceManager
+
+class BlockActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val blockedPkg = intent.getStringExtra("packageName") ?: "Unknown"
+
+        setContent {
+            FlowOrbitTheme {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("This app is blocked!", style = MaterialTheme.typography.titleLarge)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(blockedPkg, style = MaterialTheme.typography.bodyLarge)
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        val canGrant = remember { AllowanceManager.canGrantAllowance(this@BlockActivity, blockedPkg) }
+                        if (!canGrant) {
+                            val remainingMin = (AllowanceManager.cooldownRemainingMillis(this@BlockActivity, blockedPkg) / 60000L) + 1
+                            Text(
+                                "5-minute pass already used — available again in $remainingMin min.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Button(onClick = { finish() }) {
+                                Text("Return")
+                            }
+
+                            if (canGrant) {
+                                Button(onClick = {
+                                    AllowanceManager.grantAllowance(this@BlockActivity, blockedPkg)
+                                    finish()
+                                }) {
+                                    Text("Allow 5 min")
+                                }
+                            }
+
+                            Button(onClick = {
+                                // go to Home (bring launcher to front)
+                                val home = Intent(Intent.ACTION_MAIN).apply {
+                                    addCategory(Intent.CATEGORY_HOME)
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                startActivity(home)
+
+                                // also ensure we clear allowance so the block doesn't re-open instantly
+                                AllowanceManager.clearAllowance(this@BlockActivity, blockedPkg)
+                                finish()
+                            }) {
+                                Text("Go Home")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

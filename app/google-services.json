@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "159762739852",
+    "project_id": "floworbit-eccdc",
+    "storage_bucket": "floworbit-eccdc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159762739852:android:79cc8cd3f2d33c35e941a9",
+        "android_client_info": {
+          "package_name": "com.example.floworbit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCi0RCkX8zNpiBRnw7SJdjis5V8tfw-hCY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

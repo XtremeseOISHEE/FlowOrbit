@@ -1,0 +1,19 @@
+package com.example.floworbit.data.chat
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface ChatMessageDao {
+
+    @Query("SELECT * FROM chat_messages ORDER BY timestamp ASC")
+    fun getAll(): Flow<List<ChatMessageEntity>>
+
+    @Insert
+    suspend fun insert(message: ChatMessageEntity)
+
+    @Query("DELETE FROM chat_messages")
+    suspend fun clear()
+}
